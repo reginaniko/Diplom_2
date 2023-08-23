@@ -1,16 +1,21 @@
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.ValidatableResponse;
+import org.junit.Before;
 import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 public class UpdateUserInfoTests extends BaseTest{
 
+    @Before
+    public void createUser(){
+        userResponse = createUniqueUserAndReturnAsResponse(userRequest);//создать пользователя
+        userResponseBody = userResponse.extract().body().as(UserResponse.class);
+    }
+
     @Test
     @DisplayName("Изменить данные пользователя с авторизацией")
     public void testUpdateUserInfoWithAuthIsSuccessful(){
-        userResponse = createUniqueUserAndReturnAsResponse(userRequest);//создать пользователя
-        userResponseBody = userResponse.extract().body().as(UserResponse.class);
         ValidatableResponse response = baseHttpClient.patchRequestWithAuth(userResponseBody.getAccessToken(), USER_ENDPOINT, updateUserRequestBody);//изменить данные
         UserResponse updateUserResponseBody = response.extract().as(UserResponse.class);
 
@@ -25,8 +30,6 @@ public class UpdateUserInfoTests extends BaseTest{
     @Test
     @DisplayName("Изменить данные пользователя без авторизации")
     public void testUpdateUserInfoWithoutAuthReturnsError(){
-        userResponse = createUniqueUserAndReturnAsResponse(userRequest);//создать пользователя
-        userResponseBody = userResponse.extract().body().as(UserResponse.class);
         ValidatableResponse response = baseHttpClient.patchRequest(USER_ENDPOINT, updateUserRequestBody);
         UserResponse updateUserResponseBody = response.extract().as(UserResponse.class);
 

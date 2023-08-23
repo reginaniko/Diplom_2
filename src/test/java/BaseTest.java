@@ -5,6 +5,8 @@ import io.restassured.response.ValidatableResponse;
 import org.junit.After;
 import org.junit.Before;
 
+import static io.restassured.RestAssured.given;
+
 
 public class BaseTest {
     BaseHttpClient baseHttpClient = new BaseHttpClient();
@@ -14,6 +16,8 @@ public class BaseTest {
     protected static final String LOGIN_USER_ENDPOINT = "/api/auth/login";
     protected static final String USER_ENDPOINT = "/api/auth/user";
     protected static final String ORDER_ENDPOINT = "/api/orders";
+    protected static final String GET_INGREDIENTS_ENDPOINT = "/api/ingredients";
+
 
     ValidatableResponse userResponse;
     ValidatableResponse orderResponse;
@@ -35,7 +39,6 @@ public class BaseTest {
                                             + "\"61c0c5a71d1f82001bdaaa73\", "
                                             + "\"61c0c5a71d1f82001bdaaa74\", "
                                             + "\"61c0c5a71d1f82001bdaaa6d\"]}";
-    String emptyIngredientsJson = "{}";
 
     @Before
     public void setUp() {
@@ -46,6 +49,21 @@ public class BaseTest {
     public ValidatableResponse createUniqueUserAndReturnAsResponse(UserRequest request){
         return baseHttpClient.postRequest(CREATE_USER_ENDPOINT, request);
     }
+
+    @Step ("Получить Json строку ингедиентов")
+    public String getIngredients(){
+        String ingredients = given().get(BASE_URL + GET_INGREDIENTS_ENDPOINT).then().extract().path("data._id").toString();
+        String cleanedIngredients = ingredients.replace("[", "").replace("]", "").replace(" ", ""); //убрать скобки и пробелы
+        String[] elements = cleanedIngredients.split(","); //разделить по запятой
+
+        for (int i = 0; i < elements.length; i++) { //добавить кавычки
+            elements[i] = "\"" + elements[i] + "\"";
+        }
+
+        String output = String.join(", ", elements); //соединить обратно в строку через запятую
+        return ingredientsJson = "{\"ingredients\": [" + output + "]}";
+    }
+
 
     @Step("Создать заказ без авторизации")
     public ValidatableResponse createOrderWithNoAuth(String ingredientsJson){

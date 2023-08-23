@@ -5,7 +5,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class OrderResponse {
+public class UserOrderResponse {
     private User user;
     private String accessToken;
     private String refreshToken;

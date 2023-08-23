@@ -1,5 +1,7 @@
 import io.restassured.response.ValidatableResponse;
 
+import java.util.List;
+
 import static io.restassured.RestAssured.config;
 import static io.restassured.RestAssured.given;
 
